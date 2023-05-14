@@ -46,30 +46,32 @@ class MainGUI:
             # NEAREST(빠름) , LANCZOS(느림)
 
             img = ImageTk.PhotoImage(img)
-            self.poster_label.configure(image=img)
-            self.poster_label.image = img
+            self.info_poster_label.configure(image=img)
+            self.info_poster_label.image = img
         else:
-            self.poster_label.configure(image='')
-            self.poster_label.image = None
+            self.info_poster_label.configure(image='')
+            self.info_poster_label.image = None
     def __init__(self):
         self.window = Tk()
         self.window.title("알자비디오")
         self.window.geometry("1000x600")
-        # window.resizable(True, True)
 
+        # 검색창
         self.search_entry = Entry(self.window, width=40)
         self.search_entry.place(x=50,y=10)
 
+        # 검색버튼
         self.search_button = Button(self.window, text="검색", command=self.search)
         self.search_button.place(x= 340,y= 5)
 
+        # 검색한 리스트박스
         self.search_movie_listbox = Listbox(self.window,width=40)
         self.search_movie_listbox.place(x=50,y=50)
-
         self.search_movie_listbox.bind('<<ListboxSelect>>', self.show_movie_poster)
 
-        self.poster_label = Label(self.window,width=200,height=300)
-        self.poster_label.place(x=50,y=250)
+        # 정보란 포스터 라벨
+        self.info_poster_label = Label(self.window, width=200, height=300)
+        self.info_poster_label.place(x=50, y=250)
 
         self.window.mainloop()
 
