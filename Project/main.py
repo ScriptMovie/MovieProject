@@ -54,7 +54,7 @@ class MainGUI:
     def __init__(self):
         self.window = Tk()
         self.window.title("알자비디오")
-        self.window.geometry("800x600")
+        self.window.geometry("1000x600")
         # window.resizable(True, True)
 
         self.search_entry = Entry(self.window, width=40)
