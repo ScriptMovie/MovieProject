@@ -49,7 +49,7 @@ class MainGUI:
 
             self.MImage = Image.open(BytesIO(self.m.content))
             self.MImage = self.MImage.convert('RGB')
-            self.MImage = self.MImage.resize((180, 250), Image.NEAREST)
+            self.MImage = self.MImage.resize((190, 290), Image.NEAREST)
 
             self.imageM[i] = ImageTk.PhotoImage(self.MImage)
 
@@ -72,7 +72,7 @@ class MainGUI:
 
             self.pilImage = Image.open(BytesIO(self.r.content))
             self.pilImage = self.pilImage.convert('RGB')
-            self.pilImage = self.pilImage.resize((180, 250), Image.NEAREST)
+            self.pilImage = self.pilImage.resize((190, 290), Image.NEAREST)
 
             self.image[i] = ImageTk.PhotoImage(self.pilImage)
 
@@ -116,7 +116,7 @@ class MainGUI:
 
             img = Image.open(io.BytesIO(response.content))
             img = img.convert('RGB')
-            img = img.resize((180, 250), Image.NEAREST)
+            img = img.resize((190, 290), Image.NEAREST)
 
             img = ImageTk.PhotoImage(img)
             if 'title' in self.search_movie_list[index]:
@@ -134,7 +134,7 @@ class MainGUI:
     def OpenZzimFrame(self):
         self.voteRatio_Chart()
         new_frame = Toplevel(self.window, width=300, height=600)
-        new_frame.geometry('300x600+1000+100')
+        new_frame.geometry('300x600+1100+100')
         new_frame.title('찜 목록')
 
         # 딕셔너리 데이터
@@ -142,6 +142,7 @@ class MainGUI:
 
         self.Zzim_listbox = Listbox(new_frame, width=300, height=600, bg='light gray')
         self.Zzim_listbox.place(x=-3, y=0)  # -3 은 리스트박스 경계선 안보이도록
+        self.Zzim_listbox.configure(bg='#FCD572')
 
         self.Zzim_listbox.bind('<<ListboxSelect>>', self.Zzim_select_show_movie_poster)
         self.Zzim_list = []
@@ -163,7 +164,7 @@ class MainGUI:
 
             img = Image.open(io.BytesIO(response.content))
             img = img.convert('RGB')
-            img = img.resize((180, 250), Image.NEAREST)
+            img = img.resize((190, 290), Image.NEAREST)
             # NEAREST(빠름) , LANCZOS(느림)
 
             img = ImageTk.PhotoImage(img)
@@ -176,7 +177,7 @@ class MainGUI:
             self.info_poster_label.image = None
     def voteRatio_Chart(self):
         new_frame = Toplevel(self.window, width=320, height=350)
-        new_frame.geometry('320x400+1200+100')
+        new_frame.geometry('320x400+1400+100')
         new_frame.title('평점')
 
         Label(new_frame, text='Movie Ratio').pack()
@@ -186,7 +187,7 @@ class MainGUI:
         data = [round(i['vote_average'],1) for i in movie_list]
         c_width = 400
         c_height = 350
-        c = Canvas(new_frame, width=c_width, height=c_height, bg='white')
+        c = Canvas(new_frame, width=c_width, height=c_height, bg='#FCD572')
         c.pack()
         y_stretch = 30
         y_gap = 20
@@ -206,10 +207,11 @@ class MainGUI:
         self.window = Tk()
         self.window.title("알자비디오")
         self.window.geometry("1000x600+100+100")
-
+        self.window.configure(bg='#FFA500')
         # 검색창
         self.search_entry = Entry(self.window, width=40)
         self.search_entry.place(x=50,y=10)
+        self.search_entry.configure(bg='#FCD572')
 
         # 검색버튼
         self.search_button = Button(self.window, text="검색", command=self.search)
@@ -219,11 +221,11 @@ class MainGUI:
         self.search_movie_listbox = Listbox(self.window,width=40)
         self.search_movie_listbox.place(x=50,y=50)
         self.search_movie_listbox.bind('<<ListboxSelect>>', self.search_select_show_movie_poster)
+        self.search_movie_listbox.configure(bg='#FCD572')
 
         # 정보란 포스터 라벨
-        self.info_poster_label = Label(self.window, width=180, height=250)
-        self.info_poster_label.place(x=50, y=225)
-
+        self.info_poster_label = Label(self.window, width=200, height=300,bg='#EC7729')
+        self.info_poster_label.place(x=10, y=225)
         #==========================준범==================================
 
         self.MoviePage=1
@@ -262,7 +264,7 @@ class MainGUI:
         self.TvScrollBar.config(command=self.TvCanvas.xview)
 
         # 캔버스안에 프레임 설정
-        self.MFrame = Frame(self.MovieCanvas, bg="cyan")
+        self.MFrame = Frame(self.MovieCanvas,bg="cyan")
         self.TFrame = Frame(self.TvCanvas, bg="cyan")
 
         # 폰트
