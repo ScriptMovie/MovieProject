@@ -14,18 +14,15 @@ import goToDetail
 # TMDB API = 9f0490f698de8457de01c1f761c6fdc1
 api_key = '9f0490f698de8457de01c1f761c6fdc1'
 language = 'ko-KR'
-# language = 'en'
+# language = 'en-US'
 
 WINDOW_ROW = 1000
 WINDOW_COL = 600
 
-# 현재 고른 컨텐츠를 나타냄
-currentPick = None
-
 class MainGUI:
     def fetchMovieData(self):
         # Trend API 가져오기
-        url = "https://api.themoviedb.org/3/trending/movie/day?language=en-US"
+        url = "https://api.themoviedb.org/3/trending/movie/day?language="+language
         headers = {
             "accept": "application/json",
             "Authorization": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIwNWI4MWZmZTA1Y2IyNGMzYWIwNDRlYTA0YWE5Y2MxNyIsInN1YiI6IjYxNzY3MTM4ZmQ3YWE0MDA5MDhiYTM2MSIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.UOphTbPyyXEENKyaUd36d31TgXdt4y-mp5qfc407G3s"
@@ -36,7 +33,7 @@ class MainGUI:
         self.printTrendMovie()
     def fetchTvData(self):
         # Trend API 가져오기
-        url = "https://api.themoviedb.org/3/trending/tv/day?language=en-US"
+        url = "https://api.themoviedb.org/3/trending/tv/day?language="+language
         headers = {
             "accept": "application/json",
             "Authorization": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIwNWI4MWZmZTA1Y2IyNGMzYWIwNDRlYTA0YWE5Y2MxNyIsInN1YiI6IjYxNzY3MTM4ZmQ3YWE0MDA5MDhiYTM2MSIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.UOphTbPyyXEENKyaUd36d31TgXdt4y-mp5qfc407G3s"
@@ -113,8 +110,6 @@ class MainGUI:
     def search_select_show_movie_poster(self,evant):
         index = self.search_movie_listbox.curselection()[0]
         if self.search_movie_list[index]:
-            global currentPick
-            currentPick = self.search_movie_list[index] # 현재 고른 컨텐츠를 의미함.
             poster_path = self.search_movie_list[index]['poster_path']
             poster_url = f'https://image.tmdb.org/t/p/w500/{poster_path}'
             response = requests.get(poster_url)
@@ -124,17 +119,20 @@ class MainGUI:
             img = img.resize((180, 250), Image.NEAREST)
 
             img = ImageTk.PhotoImage(img)
-            self.info_poster_label.configure(image=img)
-            self.info_poster_label.image = img
+            if 'title' in self.search_movie_list[index]:
+                goToDetail.GOTODETAIL(self.info_poster_label, self.window, img, self.search_movie_list[index], "M")
+            else:
+                goToDetail.GOTODETAIL(self.info_poster_label, self.window, img, self.search_movie_list[index], "T")
         else:
             self.info_poster_label.configure(image='')
             self.info_poster_label.image = None
-            currentPick = None
+            goToDetail.currentPick = None
     def AddZzim(self):
-        if currentPick != None:
-            self.zzim.add_zzim(currentPick)
+        if goToDetail.currentPick != None:
+            self.zzim.add_zzim(goToDetail.currentPick)
             print(self.zzim.get_zzimlist())
     def OpenZzimFrame(self):
+        self.voteRatio_Chart()
         new_frame = Toplevel(self.window, width=300, height=600)
         new_frame.geometry('300x600+1000+100')
         new_frame.title('찜 목록')
@@ -148,8 +146,11 @@ class MainGUI:
         self.Zzim_listbox.bind('<<ListboxSelect>>', self.Zzim_select_show_movie_poster)
         self.Zzim_list = []
         # 딕셔너리의 키와 값을 리스트 박스에 추가
-        for result in movie_list:
-            self.Zzim_listbox.insert(END, result['title'])
+        for idx,result in enumerate(movie_list):
+            if 'title' in result:
+                self.Zzim_listbox.insert(END, f"{idx + 1} : " + result['title'])
+            else:
+                self.Zzim_listbox.insert(END, f"{idx + 1} : " + result['name'])
             self.Zzim_list.append(result)
     # 찜 목록에서 선택하면 포스터 가져오는 함수
     def Zzim_select_show_movie_poster(self, evant):
@@ -166,11 +167,41 @@ class MainGUI:
             # NEAREST(빠름) , LANCZOS(느림)
 
             img = ImageTk.PhotoImage(img)
-            self.info_poster_label.configure(image=img)
-            self.info_poster_label.image = img
+            if 'title' in self.Zzim_list[index]:
+                goToDetail.GOTODETAIL(self.info_poster_label,self.window,img,self.Zzim_list[index],"M")
+            else:
+                goToDetail.GOTODETAIL(self.info_poster_label,self.window,img,self.Zzim_list[index],"T")
         else:
             self.info_poster_label.configure(image='')
             self.info_poster_label.image = None
+    def voteRatio_Chart(self):
+        new_frame = Toplevel(self.window, width=320, height=350)
+        new_frame.geometry('320x400+1200+100')
+        new_frame.title('평점')
+
+        Label(new_frame, text='Movie Ratio').pack()
+        movie_list = self.zzim.get_zzimlist()
+
+        # 찜 목록에 있는 평점 데이터를 담는 리스트
+        data = [round(i['vote_average'],1) for i in movie_list]
+        c_width = 400
+        c_height = 350
+        c = Canvas(new_frame, width=c_width, height=c_height, bg='white')
+        c.pack()
+        y_stretch = 30
+        y_gap = 20
+        x_stretch = 10
+        x_width = 20
+        x_gap = 20
+        for x, y in enumerate(data): # x는 인덱스 값 y는 평점을 나타냄
+            x0 = x * x_stretch + x * x_width + x_gap
+            y0 = c_height - (y * y_stretch + y_gap)
+            x1 = x * x_stretch + x * x_width + x_width + x_gap
+            y1 = c_height - y_gap
+
+            c.create_rectangle(x0, y0, x1, y1, fill="sky blue")
+            c.create_text(x0 + 2, y0, anchor=SW, text=str(y))
+            c.create_text(x0 + 5, y1 + 20, anchor=SW, text=str(x+1))
     def __init__(self):
         self.window = Tk()
         self.window.title("알자비디오")

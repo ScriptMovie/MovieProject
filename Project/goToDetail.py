@@ -1,7 +1,13 @@
 from tkinter import *
 from tkinter import font
+
+# 현재 고른 컨텐츠를 나타냄
+currentPick = None
+
 class GOTODETAIL:
     def __init__(self,info_poster,window,img,data,kind):
+        global currentPick
+        currentPick = data
         # 이미지 클릭시 화면에 이미지 출력
         info_poster.configure(image=img)
         info_poster.image = img
