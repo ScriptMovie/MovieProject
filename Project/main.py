@@ -6,8 +6,10 @@ import io
 import requests
 import re
 import json
+
 import zzim
-import math
+import goToDetail
+
 
 # TMDB API = 9f0490f698de8457de01c1f761c6fdc1
 api_key = '9f0490f698de8457de01c1f761c6fdc1'
@@ -30,6 +32,7 @@ class MainGUI:
         }
         tempR = requests.get(url, headers=headers)
         self.MovieD = json.loads(tempR.text)
+        #print(self.MovieD["results"])
         self.printTrendMovie()
     def fetchTvData(self):
         # Trend API 가져오기
@@ -40,13 +43,7 @@ class MainGUI:
         }
         tempR = requests.get(url, headers=headers)
         self.TvD = json.loads(tempR.text)
-        print(self.TvD['results'])
         self.printTrendTv()
-    def GoToDetail(self,data):
-        #이미지 클릭시 화면에 이미지 출력
-        self.info_poster_label.configure(image=data)
-        self.info_poster_label.image = data
-
     def printTrendMovie(self):
         self.imageM=[0]*21
         for i in range(len(self.MovieD["results"])):
@@ -60,7 +57,8 @@ class MainGUI:
             self.imageM[i] = ImageTk.PhotoImage(self.MImage)
 
             # 버튼 안에 이미지 넣기
-            self.MImageButton = Button(self.MFrame, image=self.imageM[i], anchor=N,height=WINDOW_COL, command=lambda i=i: self.GoToDetail(self.imageM[i]))
+            kindT="M"
+            self.MImageButton = Button(self.MFrame, image=self.imageM[i], anchor=N,height=WINDOW_COL, command=lambda i=i: goToDetail.GOTODETAIL(self.info_poster_label,self.window,self.imageM[i],self.MovieD["results"][i],kindT))
             self.MImageButton.image = self.imageM[i]
             self.MImageButton.grid(row=0, column=i, sticky="ew")
 
@@ -82,7 +80,8 @@ class MainGUI:
             self.image[i] = ImageTk.PhotoImage(self.pilImage)
 
             # 버튼 안에 이미지 넣기
-            self.ImageButton = Button(self.TFrame, image=self.image[i], anchor=N,height=WINDOW_COL, command=lambda i=i: self.GoToDetail(self.image[i]))
+            kindT="T"
+            self.ImageButton = Button(self.TFrame, image=self.image[i], anchor=N,height=WINDOW_COL, command=lambda i=i: goToDetail.GOTODETAIL(self.info_poster_label,self.window,self.image[i],self.TvD["results"][i],kindT))
             self.ImageButton.image = self.image[i]
             self.ImageButton.grid(row=0, column=i, sticky="ew")
 
