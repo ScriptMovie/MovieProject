@@ -129,8 +129,22 @@ class MainGUI:
             goToDetail.currentPick = None
     def AddZzim(self):
         if goToDetail.currentPick != None:
-            self.zzim.add_zzim(goToDetail.currentPick)
-            print(self.zzim.get_zzimlist())
+            if goToDetail.currentPick not in self.zzim.get_zzimlist(): # 현재 선택한 컨텐츠가 찜 목록에 없을떄 넣어라
+                self.ZzimButton.configure(image=self.Zzim_after)
+                self.ZzimButton.image = self.Zzim_after
+                self.zzim.add_zzim(goToDetail.currentPick)
+                # print(self.zzim.get_zzimlist())
+            else: # 다시 누르면 찜 취소
+                self.ZzimButton.configure(image=self.Zzim_before)
+                self.ZzimButton.image = self.Zzim_before
+                self.zzim.del_zzim(goToDetail.currentPick)
+    def ZzimImageChangeJudge(self):
+        if goToDetail.currentPick not in self.zzim.get_zzimlist():
+            self.ZzimButton.configure(image=self.Zzim_before)
+            self.ZzimButton.image = self.Zzim_before
+        else:
+            self.ZzimButton.configure(image=self.Zzim_after)
+            self.ZzimButton.image = self.Zzim_after
     def OpenZzimFrame(self):
         self.voteRatio_Chart()
         new_frame = Toplevel(self.window, width=300, height=600)
@@ -294,6 +308,20 @@ class MainGUI:
         photo2 = ImageTk.PhotoImage(resized_image)
         # 찜 목록 버튼
         Button(self.window, image=photo2, bd=0, command=self.OpenZzimFrame).place(x=450, y=550)
+
+        image = Image.open("resource/telegram.png")
+        image_with_alpha = image.convert("RGBA")
+        resized_image = image_with_alpha.resize((100, 100))
+        photo3 = ImageTk.PhotoImage(resized_image)
+        # 텔레그램 버튼
+        Button(self.window, image=photo3 ,highlightthickness=0).place(x=8, y=125)
+
+        image = Image.open("resource/Map.png")
+        image_with_alpha = image.convert("RGBA")
+        resized_image = image_with_alpha.resize((100, 100))
+        photo4 = ImageTk.PhotoImage(resized_image)
+        # 지도 버튼
+        Button(self.window, image=photo4 ,highlightthickness=0).place(x=8, y=245)
 
         # 찜 변수 선언
         self.zzim = zzim.ZZIM()
