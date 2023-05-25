@@ -5,3 +5,5 @@ class ZZIM:
         return self.zzimlist
     def add_zzim(self,data): # 해당 컨텐츠의 전체 데이터를 가져옴
         self.zzimlist.append(data)
+    def del_zzim(self,data):
+        self.zzimlist.remove(data)
