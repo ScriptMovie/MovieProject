@@ -16,8 +16,8 @@ api_key = '9f0490f698de8457de01c1f761c6fdc1'
 language = 'ko-KR'
 # language = 'en-US'
 
-WINDOW_ROW = 1000
-WINDOW_COL = 600
+WINDOW_ROW = 1100
+WINDOW_COL = 700
 
 class MainGUI:
     def fetchMovieData(self):
@@ -55,7 +55,8 @@ class MainGUI:
 
             # 버튼 안에 이미지 넣기
             kindT="M"
-            self.MImageButton = Button(self.MFrame, image=self.imageM[i], anchor=N,height=WINDOW_COL, command=lambda i=i: goToDetail.GOTODETAIL(self.info_poster_label,self.window,self.imageM[i],self.MovieD["results"][i],kindT))
+            imageHeight = 290
+            self.MImageButton = Button(self.MFrame, image=self.imageM[i], anchor=N,height=imageHeight, command=lambda i=i: (goToDetail.GOTODETAIL(self.info_poster_label,self.window,self.imageM[i],self.MovieD["results"][i],kindT),self.ZzimImageChangeJudge()))
             self.MImageButton.image = self.imageM[i]
             self.MImageButton.grid(row=0, column=i, sticky="ew")
 
@@ -78,7 +79,8 @@ class MainGUI:
 
             # 버튼 안에 이미지 넣기
             kindT="T"
-            self.ImageButton = Button(self.TFrame, image=self.image[i], anchor=N,height=WINDOW_COL, command=lambda i=i: goToDetail.GOTODETAIL(self.info_poster_label,self.window,self.image[i],self.TvD["results"][i],kindT))
+            imageHeight = 290
+            self.ImageButton = Button(self.TFrame, image=self.image[i], anchor=N,height=imageHeight, command=lambda i=i: (goToDetail.GOTODETAIL(self.info_poster_label,self.window,self.image[i],self.TvD["results"][i],kindT),self.ZzimImageChangeJudge()))
             self.ImageButton.image = self.image[i]
             self.ImageButton.grid(row=0, column=i, sticky="ew")
 
@@ -123,6 +125,8 @@ class MainGUI:
                 goToDetail.GOTODETAIL(self.info_poster_label, self.window, img, self.search_movie_list[index], "M")
             else:
                 goToDetail.GOTODETAIL(self.info_poster_label, self.window, img, self.search_movie_list[index], "T")
+
+            self.ZzimImageChangeJudge()
         else:
             self.info_poster_label.configure(image='')
             self.info_poster_label.image = None
@@ -186,6 +190,8 @@ class MainGUI:
                 goToDetail.GOTODETAIL(self.info_poster_label,self.window,img,self.Zzim_list[index],"M")
             else:
                 goToDetail.GOTODETAIL(self.info_poster_label,self.window,img,self.Zzim_list[index],"T")
+
+            self.ZzimImageChangeJudge()
         else:
             self.info_poster_label.configure(image='')
             self.info_poster_label.image = None
@@ -220,26 +226,27 @@ class MainGUI:
     def __init__(self):
         self.window = Tk()
         self.window.title("알자비디오")
-        self.window.geometry("1000x600+100+100")
+        self.window.geometry("1100x700+100+100")
         self.window.configure(bg='#FFA500')
+        x_offset = 120
         # 검색창
         self.search_entry = Entry(self.window, width=40)
-        self.search_entry.place(x=50,y=10)
+        self.search_entry.place(x=x_offset,y=10)
         self.search_entry.configure(bg='#FCD572')
 
         # 검색버튼
         self.search_button = Button(self.window, text="검색", command=self.search)
-        self.search_button.place(x= 340,y= 5)
+        self.search_button.place(x= 290+x_offset,y= 5)
 
         # 검색한 리스트박스
         self.search_movie_listbox = Listbox(self.window,width=40)
-        self.search_movie_listbox.place(x=50,y=50)
+        self.search_movie_listbox.place(x=x_offset,y=50)
         self.search_movie_listbox.bind('<<ListboxSelect>>', self.search_select_show_movie_poster)
         self.search_movie_listbox.configure(bg='#FCD572')
 
         # 정보란 포스터 라벨
         self.info_poster_label = Label(self.window, width=200, height=300,bg='#EC7729')
-        self.info_poster_label.place(x=10, y=225)
+        self.info_poster_label.place(x=x_offset, y=225)
         #==========================준범==================================
 
         self.MoviePage=1
@@ -257,7 +264,7 @@ class MainGUI:
 
         self.TrendTvFrame = Frame(self.window, bg="orange")
         #self.TrendTvFrame.pack(fill="both",expand=True, padx=(WINDOW_ROW/2,0), pady=(WINDOW_COL/2,0))
-        self.TrendTvFrame.place(x=WINDOW_ROW/2,y=WINDOW_COL/2+30, relwidth=0.5, relheight=0.45)
+        self.TrendTvFrame.place(x=WINDOW_ROW/2,y=WINDOW_COL/2+25, relwidth=0.5, relheight=0.45)
 
         #프레임안에 스크롤바
         self.MovieScrollBar = Scrollbar(self.TrendMovieFrame, orient=HORIZONTAL)
@@ -293,21 +300,27 @@ class MainGUI:
 
         # --------------------------정일----------------------------------
         # 찜 버튼 만들기 (동그라미 버튼)
-        image = Image.open("resource/Circle.png")
+        image = Image.open("resource/Zzim_before.png")
         # 이미지 사이즈 조절
         image_with_alpha = image.convert("RGBA")
         resized_image = image_with_alpha.resize((50, 50))
         # 이미지를 PhotoImage로 변환
-        photo = ImageTk.PhotoImage(resized_image)
+        self.Zzim_before = ImageTk.PhotoImage(resized_image)
         # 버튼 생성 및 이미지 설정
-        Button(self.window, image=photo, bd=0, command=self.AddZzim).place(x=0, y=550)
+        self.ZzimButton = Button(self.window, image=self.Zzim_before, bd=0, command=self.AddZzim,highlightthickness=0)
+        self.ZzimButton.place(x=x_offset, y=625)
+
+        image = Image.open("resource/Zzim_after.png")
+        image_with_alpha = image.convert("RGBA")
+        resized_image = image_with_alpha.resize((50, 50))
+        self.Zzim_after = ImageTk.PhotoImage(resized_image)
 
         image = Image.open("resource/Zzimlist.png")
         image_with_alpha = image.convert("RGBA")
-        resized_image = image_with_alpha.resize((50, 50))
+        resized_image = image_with_alpha.resize((100, 100))
         photo2 = ImageTk.PhotoImage(resized_image)
-        # 찜 목록 버튼
-        Button(self.window, image=photo2, bd=0, command=self.OpenZzimFrame).place(x=450, y=550)
+        # # 찜 목록 버튼
+        Button(self.window, image=photo2, command=self.OpenZzimFrame,highlightthickness=0).place(x=8, y=5)
 
         image = Image.open("resource/telegram.png")
         image_with_alpha = image.convert("RGBA")
