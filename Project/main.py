@@ -152,7 +152,7 @@ class MainGUI:
     def OpenZzimFrame(self):
         self.voteRatio_Chart()
         new_frame = Toplevel(self.window, width=300, height=600)
-        new_frame.geometry('300x600+1100+100')
+        new_frame.geometry('300x600+1200+100')
         new_frame.title('찜 목록')
 
         # 딕셔너리 데이터
@@ -179,7 +179,6 @@ class MainGUI:
             poster_url = f'https://image.tmdb.org/t/p/w500/{poster_path}'
             response = requests.get(poster_url)
             # img_data = response.content
-
             img = Image.open(io.BytesIO(response.content))
             img = img.convert('RGB')
             img = img.resize((190, 290), Image.NEAREST)
@@ -197,7 +196,7 @@ class MainGUI:
             self.info_poster_label.image = None
     def voteRatio_Chart(self):
         new_frame = Toplevel(self.window, width=320, height=350)
-        new_frame.geometry('320x400+1400+100')
+        new_frame.geometry('320x400+1500+100')
         new_frame.title('평점')
 
         Label(new_frame, text='Movie Ratio').pack()
@@ -225,7 +224,7 @@ class MainGUI:
             c.create_text(x0 + 5, y1 + 20, anchor=SW, text=str(x+1))
     def __init__(self):
         self.window = Tk()
-        self.window.title("알자비디오")
+        self.window.title("무빙")
         self.window.geometry("1100x700+100+100")
         self.window.configure(bg='#FFA500')
         x_offset = 120
