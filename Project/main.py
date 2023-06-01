@@ -2,13 +2,24 @@ from tkinter import *
 from tkinter import font
 from PIL import Image, ImageTk
 from io import BytesIO
+from tkinter import ttk
+
 import io
-import requests
 import re
-import json
 
 import zzim
 import goToDetail
+import map
+
+import threading
+import sys
+from tkinter import messagebox
+import folium
+
+
+import requests
+import json
+
 
 
 # TMDB API = 9f0490f698de8457de01c1f761c6fdc1
@@ -179,6 +190,7 @@ class MainGUI:
             poster_url = f'https://image.tmdb.org/t/p/w500/{poster_path}'
             response = requests.get(poster_url)
             # img_data = response.content
+
             img = Image.open(io.BytesIO(response.content))
             img = img.convert('RGB')
             img = img.resize((190, 290), Image.NEAREST)
@@ -222,50 +234,52 @@ class MainGUI:
             c.create_rectangle(x0, y0, x1, y1, fill="sky blue")
             c.create_text(x0 + 2, y0, anchor=SW, text=str(y))
             c.create_text(x0 + 5, y1 + 20, anchor=SW, text=str(x+1))
-    def __init__(self):
-        self.window = Tk()
-        self.window.title("무빙")
-        self.window.geometry("1100x700+100+100")
-        self.window.configure(bg='#FFA500')
-        x_offset = 120
+    def home(self):
+        print(self.currentPageNum)
+
+        self.homeFrame = Frame(self.window,bg="orange",width=1000,height=800)
+        self.homeFrame.place(x=120,y=5)
+
+        if self.currentPageNum==1: #지도에서 홈으로 왔으면
+            self.mapFrame.destroy()
+        self.currentPageNum=0
+
         # 검색창
-        self.search_entry = Entry(self.window, width=40)
-        self.search_entry.place(x=x_offset,y=10)
+        self.search_entry = Entry(self.homeFrame, width=40)
+        self.search_entry.place(x=0, y=0)
         self.search_entry.configure(bg='#FCD572')
 
         # 검색버튼
-        self.search_button = Button(self.window, text="검색", command=self.search)
-        self.search_button.place(x= 290+x_offset,y= 5)
+        self.search_button = Button(self.homeFrame, text="검색", command=self.search)
+        self.search_button.place(x=290, y=0)
 
         # 검색한 리스트박스
-        self.search_movie_listbox = Listbox(self.window,width=40)
-        self.search_movie_listbox.place(x=x_offset,y=50)
+        self.search_movie_listbox = Listbox(self.homeFrame, width=40)
+        self.search_movie_listbox.place(x=0, y=50)
         self.search_movie_listbox.bind('<<ListboxSelect>>', self.search_select_show_movie_poster)
         self.search_movie_listbox.configure(bg='#FCD572')
 
         # 정보란 포스터 라벨
-        self.info_poster_label = Label(self.window, width=200, height=300,bg='#EC7729')
-        self.info_poster_label.place(x=x_offset, y=225)
-        #==========================준범==================================
+        self.info_poster_label = Label(self.homeFrame, width=200, height=300, bg='#EC7729')
+        self.info_poster_label.place(x=0, y=225)
 
-        self.MoviePage=1
-        #위도우 안에 글
-        movieLabel = Label(self.window,text="Trend Movie")
-        movieLabel.place(x=WINDOW_ROW/2,y=5)
+        # 위도우 안에 글
+        movieLabel = Label(self.homeFrame, text="Trend Movie", bg="orange")
+        movieLabel.place(x=WINDOW_ROW / 2-120, y=0)
 
-        tvLabel = Label(self.window,text="Trend Tv")
-        tvLabel.place(x=WINDOW_ROW/2,y=WINDOW_COL/2)
+        tvLabel = Label(self.homeFrame, text="Trend Tv", bg="orange")
+        tvLabel.place(x=WINDOW_ROW / 2-120, y=WINDOW_COL / 2)
 
-        #위도우 안에 프레임
-        self.TrendMovieFrame = Frame(self.window,bg="orange")
-        #self.TrendMovieFrame.pack(fill="both",expand=True, padx=(WINDOW_ROW/2,0), pady=(0,WINDOW_COL/2))
-        self.TrendMovieFrame.place(x=WINDOW_ROW/2,y=30, relwidth=0.5, relheight=0.45)
+        # 위도우 안에 프레임
+        self.TrendMovieFrame = Frame(self.homeFrame, bg="orange")
+        # self.TrendMovieFrame.pack(fill="both",expand=True, padx=(WINDOW_ROW/2,0), pady=(0,WINDOW_COL/2))
+        self.TrendMovieFrame.place(x=WINDOW_ROW / 2 - 120, y=25, relwidth=0.5, relheight=0.4)
 
-        self.TrendTvFrame = Frame(self.window, bg="orange")
-        #self.TrendTvFrame.pack(fill="both",expand=True, padx=(WINDOW_ROW/2,0), pady=(WINDOW_COL/2,0))
-        self.TrendTvFrame.place(x=WINDOW_ROW/2,y=WINDOW_COL/2+25, relwidth=0.5, relheight=0.45)
+        self.TrendTvFrame = Frame(self.homeFrame, bg="orange")
+        # self.TrendTvFrame.pack(fill="both",expand=True, padx=(WINDOW_ROW/2,0), pady=(WINDOW_COL/2,0))
+        self.TrendTvFrame.place(x=WINDOW_ROW / 2- 120, y=WINDOW_COL / 2 + 25, relwidth=0.5, relheight=0.4)
 
-        #프레임안에 스크롤바
+        # 프레임안에 스크롤바
         self.MovieScrollBar = Scrollbar(self.TrendMovieFrame, orient=HORIZONTAL)
         self.MovieScrollBar.pack(side=BOTTOM, fill=X)
 
@@ -273,31 +287,28 @@ class MainGUI:
         self.TvScrollBar.pack(side=BOTTOM, fill=X)
 
         # 캔버스 생성
-        self.MovieCanvas = Canvas(self.TrendMovieFrame,xscrollcommand=self.MovieScrollBar.set,bg="cyan")
-        self.MovieCanvas.pack(side=LEFT, fill=BOTH, expand = True)
+        self.MovieCanvas = Canvas(self.TrendMovieFrame, xscrollcommand=self.MovieScrollBar.set, bg="cyan")
+        self.MovieCanvas.pack(side=LEFT, fill=BOTH, expand=True)
 
-        self.TvCanvas = Canvas(self.TrendTvFrame,xscrollcommand=self.TvScrollBar.set,bg="red")
-        self.TvCanvas.pack(side=LEFT, fill=BOTH, expand = True)
+        self.TvCanvas = Canvas(self.TrendTvFrame, xscrollcommand=self.TvScrollBar.set, bg="red")
+        self.TvCanvas.pack(side=LEFT, fill=BOTH, expand=True)
 
         # 스크롤바와 캔버스 연결
         self.MovieScrollBar.config(command=self.MovieCanvas.xview)
         self.TvScrollBar.config(command=self.TvCanvas.xview)
 
         # 캔버스안에 프레임 설정
-        self.MFrame = Frame(self.MovieCanvas,bg="cyan")
+        self.MFrame = Frame(self.MovieCanvas, bg="cyan")
         self.TFrame = Frame(self.TvCanvas, bg="cyan")
 
         # 폰트
-        self.fontstyle = font.Font(self.window, size=24, weight='bold', family='Consolas')
-        self.fontstyle2 = font.Font(self.window, size=16, weight='bold', family='Consolas')
+        self.fontstyle = font.Font(self.homeFrame, size=24, weight='bold', family='Consolas')
+        self.fontstyle2 = font.Font(self.homeFrame, size=16, weight='bold', family='Consolas')
 
-        #api불러오기
-        self.fetchMovieData()
-        self.fetchTvData()
+        # api불러오기
+        #self.fetchMovieData()
+        #self.fetchTvData()
 
-        # ==========================준범==================================
-
-        # --------------------------정일----------------------------------
         # 찜 버튼 만들기 (동그라미 버튼)
         image = Image.open("resource/Zzim_before.png")
         # 이미지 사이즈 조절
@@ -306,19 +317,47 @@ class MainGUI:
         # 이미지를 PhotoImage로 변환
         self.Zzim_before = ImageTk.PhotoImage(resized_image)
         # 버튼 생성 및 이미지 설정
-        self.ZzimButton = Button(self.window, image=self.Zzim_before, bd=0, command=self.AddZzim,highlightthickness=0)
-        self.ZzimButton.place(x=x_offset, y=625)
+        self.ZzimButton = Button(self.homeFrame, image=self.Zzim_before, bd=0, command=self.AddZzim, highlightthickness=0)
+        self.ZzimButton.place(x=0, y=625)
 
         image = Image.open("resource/Zzim_after.png")
         image_with_alpha = image.convert("RGBA")
         resized_image = image_with_alpha.resize((50, 50))
         self.Zzim_after = ImageTk.PhotoImage(resized_image)
 
+    def callMap(self):
+        if self.currentPageNum==0: #홈에서 지도로 왔으면
+            self.homeFrame.destroy()
+        self.currentPageNum=1
+
+
+        self.mapFrame = Frame(self.window,bg="orange",width=1000,height=800)
+        self.mapFrame.place(x=120,y=5)
+
+        map.MAP(self.window, self.mapFrame,self.cefInitialNum)
+        #cef는 한번만 초기화 해야한다.
+        self.cefInitialNum += 1
+
+    def __init__(self):
+        #현재 있는곳
+        #0 : 홈, 1: 지도
+        self.currentPageNum = 0
+
+        self.window = Tk()
+        self.window.title("무빙")
+        self.window.geometry("1100x700+100+100")
+        self.window.configure(bg='#FFA500')
+
+        #지도
+        self.cefInitialNum=0
+
+        self.home()
+        #====================왼쪽 메뉴 바========================
+        # 찜 목록 버튼
         image = Image.open("resource/Zzimlist.png")
         image_with_alpha = image.convert("RGBA")
         resized_image = image_with_alpha.resize((100, 100))
         photo2 = ImageTk.PhotoImage(resized_image)
-        # # 찜 목록 버튼
         Button(self.window, image=photo2, command=self.OpenZzimFrame,highlightthickness=0).place(x=8, y=5)
 
         image = Image.open("resource/telegram.png")
@@ -328,17 +367,26 @@ class MainGUI:
         # 텔레그램 버튼
         Button(self.window, image=photo3 ,highlightthickness=0).place(x=8, y=125)
 
+
+        # 지도 버튼
         image = Image.open("resource/Map.png")
         image_with_alpha = image.convert("RGBA")
         resized_image = image_with_alpha.resize((100, 100))
         photo4 = ImageTk.PhotoImage(resized_image)
-        # 지도 버튼
-        Button(self.window, image=photo4 ,highlightthickness=0).place(x=8, y=245)
+        self.mapBtn = Button(self.window, image=photo4 ,highlightthickness=0,command=lambda: self.callMap())
+        self.mapBtn.place(x=8, y=245)
+
+        #홈버튼
+        image = Image.open("resource/Map.png")
+        image_with_alpha = image.convert("RGBA")
+        resized_image = image_with_alpha.resize((100, 100))
+        photo5 = ImageTk.PhotoImage(resized_image)
+        self.homeBtn = Button(self.window, image=photo5, highlightthickness=0,command =lambda:self.home())
+        self.homeBtn.place(x=8, y=360)
+        #====================왼쪽 메뉴 바========================
 
         # 찜 변수 선언
         self.zzim = zzim.ZZIM()
-        # ----------------------------------------------------------------
-
         self.window.mainloop()
 
 
