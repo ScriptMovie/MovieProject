@@ -118,7 +118,21 @@ class MainGUI:
             elif not bool(re.match('^[a-zA-Z]+$', title[0][0])):
                 self.search_movie_listbox.insert(END, result['title'])
                 self.search_movie_list.append(result)
-            # print(f'Overview: {overview}') # 줄거리
+
+        url = f'https://api.themoviedb.org/3/search/tv?api_key={api_key}&query={query}&language={language}'
+        response = requests.get(url)
+        data = response.json()
+
+        results = data['results']
+        for result in results:
+            overview = result['overview']
+            title = result['name'].split()
+            if language == 'en' and bool(re.match('^[a-zA-Z]+$', title[0][0])):  # 제목이 영어인지 확인한다 / 한글 버전 일시에 한글만 나열함
+                self.search_movie_listbox.insert(END, result['name'])
+                self.search_movie_list.append(result)
+            elif not bool(re.match('^[a-zA-Z]+$', title[0][0])):
+                self.search_movie_listbox.insert(END, result['name'])
+                self.search_movie_list.append(result)
     # 선택한 영화의 포스터 이미지를 가져와서 보여주는 함수
     def search_select_show_movie_poster(self,evant):
         index = self.search_movie_listbox.curselection()[0]
