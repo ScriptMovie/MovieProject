@@ -6,7 +6,7 @@ currentPick = None
 
 class GOTODETAIL:
     def __init__(self,info_poster,window,img,data,kind):
-        x_offset = 100
+        x_offset = -20
         global currentPick
         currentPick = data
         # 이미지 클릭시 화면에 이미지 출력

@@ -1,0 +1,46 @@
+
+[2023-06-02 17:53:57] Traceback (most recent call last):
+  File "C:\Users\rukab\OneDrive\문서\GitHub\MovieProject\Project\main.py", line 409, in <module>
+    MainGUI()
+  File "C:\Users\rukab\OneDrive\문서\GitHub\MovieProject\Project\main.py", line 391, in __init__
+    Button(self.window,image=photo4,command=lambda: self.show_frame(self.mapFrame)).place(x=8, y=245)
+  File "C:\Python309\lib\tkinter\__init__.py", line 2650, in __init__
+    Widget.__init__(self, master, 'button', cnf, kw)
+  File "C:\Python309\lib\tkinter\__init__.py", line 2572, in __init__
+    self.tk.call(
+_tkinter.TclError: can't invoke "button" command: application has been destroyed
+
+
+[2023-06-02 17:54:21] Traceback (most recent call last):
+  File "C:\Users\rukab\OneDrive\문서\GitHub\MovieProject\Project\main.py", line 408, in <module>
+    MainGUI()
+  File "C:\Users\rukab\OneDrive\문서\GitHub\MovieProject\Project\main.py", line 399, in __init__
+    Button(self.window, image=photo4, command=lambda: self.show_frame(self.mapFrame)).place(x=8, y=245)
+  File "C:\Python309\lib\tkinter\__init__.py", line 2650, in __init__
+    Widget.__init__(self, master, 'button', cnf, kw)
+  File "C:\Python309\lib\tkinter\__init__.py", line 2572, in __init__
+    self.tk.call(
+_tkinter.TclError: can't invoke "button" command: application has been destroyed
+
+
+[2023-06-02 17:55:03] Traceback (most recent call last):
+  File "C:\Users\rukab\OneDrive\문서\GitHub\MovieProject\Project\main.py", line 408, in <module>
+    MainGUI()
+  File "C:\Users\rukab\OneDrive\문서\GitHub\MovieProject\Project\main.py", line 399, in __init__
+    Button(self.window, image=photo4, command=lambda: self.show_frame(self.mapFrame)).place(x=8, y=245)
+  File "C:\Python309\lib\tkinter\__init__.py", line 2650, in __init__
+    Widget.__init__(self, master, 'button', cnf, kw)
+  File "C:\Python309\lib\tkinter\__init__.py", line 2572, in __init__
+    self.tk.call(
+_tkinter.TclError: can't invoke "button" command: application has been destroyed
+
+
+[2023-06-02 18:05:43] Traceback (most recent call last):
+  File "C:\Users\rukab\OneDrive\문서\GitHub\MovieProject\Project\main.py", line 409, in <module>
+    MainGUI()
+  File "C:\Users\rukab\OneDrive\문서\GitHub\MovieProject\Project\main.py", line 405, in __init__
+    self.window.mainloop()
+  File "C:\Python309\lib\tkinter\__init__.py", line 1429, in mainloop
+    self.tk.mainloop(n)
+KeyboardInterrupt
+
