@@ -19,6 +19,8 @@ import folium
 
 import requests
 import json
+import teller
+import noti
 import spam
 
 api_key = spam.getapikey('tmdb')
@@ -335,6 +337,8 @@ class MainGUI:
         map.MAP(self.window, self.mapFrame,self.cefInitialNum)
         #cef는 한번만 초기화 해야한다.
         self.cefInitialNum += 1
+    def tele_start(self):
+        teller.telegram_start()
 
     def __init__(self):
         #현재 있는곳
@@ -363,7 +367,7 @@ class MainGUI:
         resized_image = image_with_alpha.resize((100, 100))
         photo3 = ImageTk.PhotoImage(resized_image)
         # 텔레그램 버튼
-        Button(self.window, image=photo3 ,highlightthickness=0).place(x=8, y=125)
+        Button(self.window, image=photo3 ,highlightthickness=0,command=self.tele_start).place(x=8, y=125)
 
 
         # 지도 버튼
@@ -388,5 +392,6 @@ class MainGUI:
         self.window.mainloop()
 
 
+        self.tel_count = 0
 
 MainGUI()
