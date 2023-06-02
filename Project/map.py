@@ -11,8 +11,9 @@ from cefpython3 import cefpython as cef
 
 import requests
 import json
+import spam
 
-url = "	https://openapi.gg.go.kr/MovieTheater?KEY=0026aa7c9348412680cca736f93d737b&pIndex=2&Type=json"
+url = "https://openapi.gg.go.kr/MovieTheater?KEY=" + spam.getapikey('map')+ "&pIndex=2&Type=json"
 
 response = requests.get(url)
 contents = response.text
@@ -55,7 +56,7 @@ class MAP:
         window_info = cef.WindowInfo(frame.winfo_id())
         window_info.SetAsChild(frame.winfo_id(), [0,0,800,700])
         if self.cefNum==0:
-            cef.Initialize()
+           cef.Initialize()
         self.browser = cef.CreateBrowserSync(window_info, url='file:///map.html')
         cef.MessageLoop()
 

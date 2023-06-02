@@ -19,11 +19,9 @@ import folium
 
 import requests
 import json
+import spam
 
-
-
-# TMDB API = 9f0490f698de8457de01c1f761c6fdc1
-api_key = '9f0490f698de8457de01c1f761c6fdc1'
+api_key = spam.getapikey('tmdb')
 language = 'ko-KR'
 # language = 'en-US'
 
