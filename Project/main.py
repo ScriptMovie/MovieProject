@@ -24,7 +24,6 @@ import noti
 import spam
 
 api_key = spam.getapikey('tmdb')
-language = 'ko-KR'
 # language = 'en-US'
 
 WINDOW_ROW = 1100
@@ -34,7 +33,7 @@ WINDOW_COL = 700
 class MainGUI:
     def fetchMovieData(self):
         # Trend API 가져오기
-        url = "https://api.themoviedb.org/3/trending/movie/day?language="+language
+        url = "https://api.themoviedb.org/3/trending/movie/day?language="+self.language
         headers = {
             "accept": "application/json",
             "Authorization": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIwNWI4MWZmZTA1Y2IyNGMzYWIwNDRlYTA0YWE5Y2MxNyIsInN1YiI6IjYxNzY3MTM4ZmQ3YWE0MDA5MDhiYTM2MSIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.UOphTbPyyXEENKyaUd36d31TgXdt4y-mp5qfc407G3s"
@@ -46,7 +45,7 @@ class MainGUI:
         self.printTrendMovie()
     def fetchTvData(self):
         # Trend API 가져오기
-        url = "https://api.themoviedb.org/3/trending/tv/day?language="+language
+        url = "https://api.themoviedb.org/3/trending/tv/day?language="+self.language
         headers = {
             "accept": "application/json",
             "Authorization": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIwNWI4MWZmZTA1Y2IyNGMzYWIwNDRlYTA0YWE5Y2MxNyIsInN1YiI6IjYxNzY3MTM4ZmQ3YWE0MDA5MDhiYTM2MSIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.UOphTbPyyXEENKyaUd36d31TgXdt4y-mp5qfc407G3s"
@@ -71,7 +70,7 @@ class MainGUI:
             # 버튼 안에 이미지 넣기
             kindT="M"
             imageHeight = 290
-            self.MImageButton = Button(self.MFrame, image=self.imageM[i], anchor=N,height=imageHeight, command=lambda i=i: (goToDetail.GOTODETAIL(self.info_poster_label,self.homeFrame,self.imageM[i],self.MovieD["results"][i],kindT),self.ZzimImageChangeJudge()))
+            self.MImageButton = Button(self.MFrame, image=self.imageM[i], anchor=N,height=imageHeight, command=lambda i=i: (goToDetail.GOTODETAIL(self.info_poster_label,self.homeFrame,self.imageM[i],self.MovieD["results"][i],kindT,self.language),self.ZzimImageChangeJudge()))
             self.MImageButton.image = self.imageM[i]
             self.MImageButton.grid(row=0, column=i, sticky="ew")
 
@@ -96,7 +95,7 @@ class MainGUI:
             # 버튼 안에 이미지 넣기
             kindT="T"
             imageHeight = 290
-            self.ImageButton = Button(self.TFrame, image=self.image[i], anchor=N,height=imageHeight, command=lambda i=i: (goToDetail.GOTODETAIL(self.info_poster_label,self.homeFrame,self.image[i],self.TvD["results"][i],kindT),self.ZzimImageChangeJudge()))
+            self.ImageButton = Button(self.TFrame, image=self.image[i], anchor=N,height=imageHeight, command=lambda i=i: (goToDetail.GOTODETAIL(self.info_poster_label,self.homeFrame,self.image[i],self.TvD["results"][i],kindT,self.language),self.ZzimImageChangeJudge()))
             self.ImageButton.image = self.image[i]
             self.ImageButton.grid(row=0, column=i, sticky="ew")
 
@@ -107,38 +106,23 @@ class MainGUI:
 
     def search(self):
         query = self.search_entry.get()
-        url = f'https://api.themoviedb.org/3/search/movie?api_key={api_key}&query={query}&language={language}'
+        url = f'https://api.themoviedb.org/3/search/movie?api_key={api_key}&query={query}&language={self.language}'
         response = requests.get(url)
         data = response.json()
-
 
         results = data['results']
         self.search_movie_listbox.delete(0, END)      # 리스트 박스 요소 모두 제거
         self.search_movie_list = []
         for result in results:
-            overview = result['overview']
             title = result['title'].split()
-            if language == 'en' and bool(re.match('^[a-zA-Z]+$', title[0][0])):  # 제목이 영어인지 확인한다 / 한글 버전 일시에 한글만 나열함
-                self.search_movie_listbox.insert(END, result['title'])
-                self.search_movie_list.append(result)
-            elif not bool(re.match('^[a-zA-Z]+$', title[0][0])):
-                self.search_movie_listbox.insert(END, result['title'])
-                self.search_movie_list.append(result)
-
-        url = f'https://api.themoviedb.org/3/search/tv?api_key={api_key}&query={query}&language={language}'
-        response = requests.get(url)
-        data = response.json()
-
-        results = data['results']
-        for result in results:
-            overview = result['overview']
-            title = result['name'].split()
-            if language == 'en' and bool(re.match('^[a-zA-Z]+$', title[0][0])):  # 제목이 영어인지 확인한다 / 한글 버전 일시에 한글만 나열함
-                self.search_movie_listbox.insert(END, result['name'])
-                self.search_movie_list.append(result)
-            elif not bool(re.match('^[a-zA-Z]+$', title[0][0])):
-                self.search_movie_listbox.insert(END, result['name'])
-                self.search_movie_list.append(result)
+            if self.language=='en-US':
+                if bool(re.match('^[a-zA-Z]+$', title[0][0])):  # 제목이 영어인지 확인한다 / 한글 버전 일시에 한글만 나열함
+                    self.search_movie_listbox.insert(END, result['title'])
+                    self.search_movie_list.append(result)
+            elif self.language=='ko-KR':
+                if not bool(re.match('^[a-zA-Z]+$', title[0][0])):
+                    self.search_movie_listbox.insert(END, result['title'])
+                    self.search_movie_list.append(result)
     # 선택한 영화의 포스터 이미지를 가져와서 보여주는 함수
     def search_select_show_movie_poster(self,evant):
         index = self.search_movie_listbox.curselection()[0]
@@ -153,9 +137,9 @@ class MainGUI:
 
             img = ImageTk.PhotoImage(img)
             if 'title' in self.search_movie_list[index]:
-                goToDetail.GOTODETAIL(self.info_poster_label, self.homeFrame, img, self.search_movie_list[index], "M")
+                goToDetail.GOTODETAIL(self.info_poster_label, self.homeFrame, img, self.search_movie_list[index], "M",self.language)
             else:
-                goToDetail.GOTODETAIL(self.info_poster_label, self.homeFrame, img, self.search_movie_list[index], "T")
+                goToDetail.GOTODETAIL(self.info_poster_label, self.homeFrame, img, self.search_movie_list[index], "T",self.language)
 
             self.ZzimImageChangeJudge()
         else:
@@ -252,15 +236,25 @@ class MainGUI:
             c.create_rectangle(x0, y0, x1, y1, fill="sky blue")
             c.create_text(x0 + 2, y0, anchor=SW, text=str(y))
             c.create_text(x0 + 5, y1 + 20, anchor=SW, text=str(x+1))
-    def home(self):
-        print(self.currentPageNum)
 
+    def checkState(self):
+        self.var = 1-self.var
+        if self.var == 1:
+            self.language = 'en-US'
+        elif self.var == 0:
+            self.language = 'ko-KR'
+        self.home()
+    def home(self):
         self.homeFrame = Frame(self.window,bg="orange",width=1000,height=800)
         self.homeFrame.place(x=120,y=5)
 
         # if self.currentPageNum==1: #지도에서 홈으로 왔으면
         #     self.mapFrame.destroy()
         # self.currentPageNum=0
+
+        #한영 토글
+        self.LanguageCheck = Button(self.homeFrame, text=self.language , command = self.checkState)
+        self.LanguageCheck.place(x=330,y=0)
 
         # 검색창
         self.search_entry = Entry(self.homeFrame, width=40)
@@ -278,7 +272,7 @@ class MainGUI:
         self.search_movie_listbox.configure(bg='#FCD572')
 
         # 정보란 포스터 라벨
-        self.info_poster_label = Label(self.homeFrame, width=200, height=300, bg='#EC7729')
+        self.info_poster_label = Label(self.homeFrame, width=200, height=300, bg="orange")
         self.info_poster_label.place(x=0, y=225)
 
         # 위도우 안에 글
@@ -305,10 +299,10 @@ class MainGUI:
         self.TvScrollBar.pack(side=BOTTOM, fill=X)
 
         # 캔버스 생성
-        self.MovieCanvas = Canvas(self.TrendMovieFrame, xscrollcommand=self.MovieScrollBar.set, bg="cyan")
+        self.MovieCanvas = Canvas(self.TrendMovieFrame, xscrollcommand=self.MovieScrollBar.set, bg="orange")
         self.MovieCanvas.pack(side=LEFT, fill=BOTH, expand=True)
 
-        self.TvCanvas = Canvas(self.TrendTvFrame, xscrollcommand=self.TvScrollBar.set, bg="red")
+        self.TvCanvas = Canvas(self.TrendTvFrame, xscrollcommand=self.TvScrollBar.set, bg="orange")
         self.TvCanvas.pack(side=LEFT, fill=BOTH, expand=True)
 
         # 스크롤바와 캔버스 연결
@@ -324,8 +318,8 @@ class MainGUI:
         self.fontstyle2 = font.Font(self.homeFrame, size=16, weight='bold', family='Consolas')
 
         # api불러오기
-        # self.fetchMovieData()
-        # self.fetchTvData()
+        self.fetchMovieData()
+        self.fetchTvData()
 
         # 찜 버튼 만들기 (동그라미 버튼)
         image = Image.open("resource/Zzim_before.png")
@@ -364,6 +358,7 @@ class MainGUI:
         #현재 있는곳
         #0 : 홈, 1: 지도
         self.currentPageNum = 0
+        self.language = 'ko-KR'
 
         self.window = Tk()
         self.window.title("무빙")
@@ -376,7 +371,9 @@ class MainGUI:
         #지도
         self.cefInitialNum=0
 
+        self.var = 0
         self.home()
+
         #====================왼쪽 메뉴 바========================
         # 찜 목록 버튼
 
@@ -386,28 +383,29 @@ class MainGUI:
         Label(self.ZzimlistFrame, bg="orange", width=1000, height=800).pack()
         self.CreateZZimList()
 
-
         image = Image.open("resource/Zzimlist.png")
         image_with_alpha = image.convert("RGBA")
         resized_image = image_with_alpha.resize((100, 100))
         photo2 = ImageTk.PhotoImage(resized_image)
         # Button(self.window, image=photo2, command=self.OpenZzimFrame,highlightthickness=0).place(x=8, y=5)
-        Button(self.window,image=photo2,highlightthickness=0,command=lambda: self.show_frame(self.ZzimlistFrame)).place(x=8, y=5)
+        Button(self.window, image=photo2, highlightthickness=0,
+               command=lambda: self.show_frame(self.ZzimlistFrame)).place(x=8, y=5)
 
         image = Image.open("resource/telegram.png")
         image_with_alpha = image.convert("RGBA")
         resized_image = image_with_alpha.resize((100, 100))
         photo3 = ImageTk.PhotoImage(resized_image)
         # 텔레그램 버튼
-        Button(self.window, image=photo3 ,highlightthickness=0,command=self.tele_start).place(x=8, y=125)
+        Button(self.window, image=photo3, highlightthickness=0, command=self.tele_start).place(x=8, y=125)
 
-        #홈버튼
+        # 홈버튼
         image = Image.open("resource/home.png")
         image_with_alpha = image.convert("RGBA")
         resized_image = image_with_alpha.resize((100, 100))
         photo5 = ImageTk.PhotoImage(resized_image)
         # self.homeBtn = Button(self.window, image=photo5, highlightthickness=0,command =lambda:self.home())
-        Button(self.window,image=photo5,highlightthickness=0,command=lambda: self.show_frame(self.homeFrame)).place(x=8, y=360)
+        Button(self.window, image=photo5, highlightthickness=0, command=lambda: self.show_frame(self.homeFrame)).place(
+            x=8, y=360)
         # self.homeBtn.place(x=8, y=360)
 
         # 지도 버튼
@@ -416,7 +414,7 @@ class MainGUI:
         resized_image = image_with_alpha.resize((100, 100))
         photo4 = ImageTk.PhotoImage(resized_image)
         # self.callMap()
-        self.mapBtn = Button(self.window, image=photo4 ,highlightthickness=0,command=lambda: self.callMap())
+        self.mapBtn = Button(self.window, image=photo4, highlightthickness=0, command=lambda: self.callMap())
         # Button(self.window, image=photo4, command=lambda: self.show_frame(self.mapFrame)).place(x=8, y=245)
         self.mapBtn.place(x=8, y=245)
         #====================왼쪽 메뉴 바========================
