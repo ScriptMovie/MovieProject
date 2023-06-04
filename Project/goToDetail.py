@@ -5,7 +5,7 @@ from tkinter import font
 currentPick = None
 
 class GOTODETAIL:
-    def __init__(self,info_poster,window,img,data,kind):
+    def __init__(self,info_poster,window,img,data,kind,language):
         x_offset = -20
         global currentPick
         currentPick = data
@@ -22,7 +22,7 @@ class GOTODETAIL:
         # 예전 text가리기
         self.info_hide = Label(window, width=29, height=20)
         self.info_hide.place(x=240+x_offset, y=225)
-        self.info_hide.configure(bg='#FFA500')
+        self.info_hide.configure(bg="orange")
 
         # 정보란 콘텐츠 정보
 
@@ -38,7 +38,11 @@ class GOTODETAIL:
             self.info_title_label.configure(bg='#FFA500')
             self.info_title_label.place(x=240+x_offset, y=225)
             #출시일
-            self.info_release_label = Label(window,text="개봉일: " + data["release_date"],justify='left')
+            if language == 'ko-KR':
+                tempText = "개봉일 : "
+            elif language == 'en-US':
+                tempText = "release-date : "
+            self.info_release_label = Label(window,text=tempText + data["release_date"],justify='left')
             self.info_release_label.configure(bg='#FFA500')
             self.info_release_label.place(x=240+x_offset,y=330)
         elif kind == "T":  # TV
@@ -48,7 +52,11 @@ class GOTODETAIL:
             self.info_title_label.configure(bg='#FFA500')
             self.info_title_label.place(x=240+x_offset, y=225)
             #출시일
-            self.info_release_label = Label(window,text="방영일: " + data["first_air_date"],justify='left')
+            if language == 'ko-KR':
+                tempText = "방영일 : "
+            elif language == 'en-US':
+                tempText = "day-of-the-show : "
+            self.info_release_label = Label(window,text=tempText + data["first_air_date"],justify='left')
             self.info_release_label.configure(bg='#FFA500')
             self.info_release_label.place(x=240+x_offset,y=330)
 
