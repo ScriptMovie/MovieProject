@@ -56,6 +56,7 @@ class MainGUI:
         self.printTrendTv()
     def printTrendMovie(self):
         self.imageM=[0]*21
+        noti.telegram_Movie_Trand.clear()
         for i in range(len(self.MovieD["results"])):
             self.MimageUrl = "https://image.tmdb.org/t/p/w200" + str(self.MovieD["results"][i]["poster_path"])
             self.m = requests.get(self.MimageUrl)
@@ -81,6 +82,7 @@ class MainGUI:
 
     def printTrendTv(self):
         self.image=[0]*21
+        noti.telegram_TV_Trand.clear()
         for i in range(len(self.TvD["results"])):
             self.imageUrl = "https://image.tmdb.org/t/p/w200" + str(self.TvD["results"][i]["poster_path"])
             self.r = requests.get(self.imageUrl)
